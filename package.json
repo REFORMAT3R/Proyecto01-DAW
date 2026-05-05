@@ -1,0 +1,21 @@
+{
+  "name": "laboratorio04",
+  "version": "1.0.0",
+  "description": "node para laboratorio04",
+  "homepage": "https://github.com/REFORMAT3R/Proyecto01-DAW#readme",
+  "bugs": {
+    "url": "https://github.com/REFORMAT3R/Proyecto01-DAW/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/REFORMAT3R/Proyecto01-DAW.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  }
+}
