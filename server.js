@@ -1,72 +1,56 @@
 const express = require("express");
 const fs = require('fs');
 const path = require('path');
+const { marked } = require('marked');
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+// Listar archivos markdown
+app.get('/archivos', (req, res) => {
+    const dir = path.join(__dirname, 'markdown');
 
-// Ruta principal
-app.get("/", (req, res) => {
+    fs.readdir(dir, (err, files) => {
+        if (err) {
+            return res.json({ error: "Error leyendo archivos" });
+        }
 
-    res.send("Servidor funcionando");
-
-});
-
-
-// API - listar archivos
-app.get("/api/files", (req, res) => {
-
-    res.json([
-        "hola.md",
-        "tarea.md",
-        "readme.md"
-    ]);
-
-});
-
-//API - mostrar contenido
-app.get("/api/files/:name", (req, res) => {
-
-    const nombre = req.params.name;
-
-    res.json({
-        html: `<h1>Contenido de ${nombre}</h1>`
+        const mdFiles = files.filter(f => f.endsWith('.md'));
+        res.json({ archivos: mdFiles });
     });
 });
 
-app.get('/md/:nombre', async(req, res)=>{
-    const { marked } = await import('marked');
-    const nombreArchivo= req.params.nombre;
-    const ruta = path.join(__dirname, 'markdowns', nombreArchivo + '.md')
+//Leer y convertir markdown a HTML
+app.get('/archivo/:nombre', (req, res) => {
+    const ruta = path.join(__dirname, 'markdown', req.params.nombre);
 
-    fs.readFile(ruta, 'utf-8',(err,  data)=>{
-        if(err){
-            return res.send("Archivo no encontrado");
-        }
+    fs.readFile(ruta, 'utf8', (err, data) => {
+        if (err) return res.json({ error: "No encontrado" });
+
         const html = marked(data);
-        res.send(html);
-    })
-})
 
-//API - recibir JSON
+        res.json({ contenido: html });
+    });
+});
 
-app.post("/api/files", (req, res) => {
-
+//Crear archivo markdown
+app.post('/archivo', (req, res) => {
     const { nombre, contenido } = req.body;
 
-    res.json({
-        mensaje: "Archivo recibido",
-        nombre,
-        contenido
-    });
+    if (!nombre || !contenido) {
+        return res.json({ error: "Faltan datos" });
+    }
 
+    const ruta = path.join(__dirname, 'markdown', nombre + '.md');
+
+    fs.writeFile(ruta, contenido, (err) => {
+        if (err) return res.json({ error: "No se pudo guardar" });
+
+        res.json({ mensaje: "Archivo creado" });
+    });
 });
 
 app.listen(PORT, () => {
-
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
-
 });
-
