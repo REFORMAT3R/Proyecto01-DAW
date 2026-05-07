@@ -1,7 +1,6 @@
 const express = require("express");
 const fs = require('fs');
 const path = require('path');
-const { marked } = require('marked');
 
 const app = express();
 const PORT = 3000;
@@ -30,17 +29,19 @@ app.get("/api/files", (req, res) => {
 
 
 // Mostrar contenido
-app.get("/api/files/:name", (req, res) => {
+app.get("/api/files/:name", async (req, res) => {
 
     const nombre = req.params.name;
 
     const ruta = path.join(__dirname, 'markdowns', nombre);
 
-    fs.readFile(ruta, 'utf8', (err, data) => {
+    fs.readFile(ruta, 'utf8', async (err, data) => {
 
         if (err) {
             return res.json({ error: "Archivo no encontrado" });
         }
+
+        const { marked } = await import('marked');
 
         const html = marked(data);
 
