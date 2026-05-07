@@ -1,74 +1,104 @@
 const express = require("express");
-const fs = require('fs');
-const path = require('path');
+
+const fs = require("fs");
+const path = require("path");
+const { marked } = require("marked");
 
 const app = express();
+
 const PORT = 3000;
 
 app.use(express.json());
 
+// Ruta principal
+app.get("/", (req, res) => {
 
-// Listar archivos
+    res.send("Servidor funcionando");
+
+});
+
+
+// API - listar archivos
 app.get("/api/files", (req, res) => {
 
-    const dir = path.join(__dirname, 'markdowns');
+    const dir = path.join(__dirname, "markdowns");
 
     fs.readdir(dir, (err, files) => {
 
         if (err) {
-            return res.json({ error: "Error leyendo archivos" });
+
+            return res.json({
+                error: "Error leyendo archivos"
+            });
+
         }
 
-        const mdFiles = files.filter(f => f.endsWith('.md'));
+        const mdFiles = files.filter(file =>
+            file.endsWith(".md")
+        );
 
         res.json(mdFiles);
 
     });
 
 });
+//API - mostrar contenido
+app.get("/api/files/:name", (req, res) => {
 
+    const ruta = path.join(
+        __dirname,
+        "markdowns",
+        req.params.name
+    );
 
-// Mostrar contenido
-app.get("/api/files/:name", async (req, res) => {
-
-    const nombre = req.params.name;
-
-    const ruta = path.join(__dirname, 'markdowns', nombre);
-
-    fs.readFile(ruta, 'utf8', async (err, data) => {
+    fs.readFile(ruta, "utf8", (err, data) => {
 
         if (err) {
-            return res.json({ error: "Archivo no encontrado" });
-        }
 
-        const { marked } = await import('marked');
+            return res.json({
+                error: "Archivo no encontrado"
+            });
+
+        }
 
         const html = marked(data);
 
         res.json({
-            html: html
+            html
         });
 
     });
 
 });
 
+//API - recibir JSON
 
-// Crear archivo markdown
 app.post("/api/files", (req, res) => {
 
     const { nombre, contenido } = req.body;
 
     if (!nombre || !contenido) {
-        return res.json({ error: "Faltan datos" });
+
+        return res.json({
+            error: "Faltan datos"
+        });
+
     }
 
-    const ruta = path.join(__dirname, 'markdowns', nombre + '.md');
+    const ruta = path.join(
+        __dirname,
+        "markdowns",
+        nombre + ".md"
+    );
 
     fs.writeFile(ruta, contenido, (err) => {
 
         if (err) {
-            return res.json({ error: "No se pudo guardar" });
+
+            return res.json({
+                error: "No se pudo guardar"
+            });
+
         }
 
         res.json({
