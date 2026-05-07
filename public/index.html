@@ -4,8 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            margin: 40px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input, textarea {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        ul {
+            padding: 0;
+        }
+        li {
+            list-style: none;
+            margin-bottom: 10px;
+        }
+        #contenido {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+    </style>
 </head>
 <body>
+
     <h1>Aplicación Markdown</h1>
     <hr>
 
@@ -70,6 +106,7 @@
             document.getElementById('contenido').innerHTML = data.html;
         }
 
+        // Función crear archivo
         async function crearArchivo() {
 
             const nombre =
