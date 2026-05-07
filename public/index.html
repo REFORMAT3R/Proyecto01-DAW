@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 40px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input, textarea {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        ul {
+            padding: 0;
+        }
+        li {
+            list-style: none;
+            margin-bottom: 10px;
+        }
+        #contenido {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Aplicación Markdown</h1>
+    <hr>
+
+    <h2>Archivos disponibles</h2>
+
+    <button onclick="listarArchivos()">
+        Listar archivos
+    </button>
+
+    <ul id="listaArchivos"></ul>
+    <hr>
+
+    <h2>Contenido del archivo</h2>
+    <div id="contenido"></div>
+    <hr>
+
+    <h2>Crear nuevo archivo Markdown</h2>
+    <input type="text" id="nombreArchivo" placeholder="Nombre del archivo">
+    <br><br>
+
+    <textArea
+        id="contenidoArchivo"
+        rows="10"
+        cols="50"
+        placeholder="Contenido markdown">
+    </textArea>
+    <br>
+
+    <button onclick="crearArchivo()">
+        Crear archivo
+    </button>
+
+    <script>
+
+        // Función listar archivos
+        async function listarArchivos() {
+            
+            const respuesta = await fetch('/api/files');
+            const archivos = await respuesta.json();
+            const lista = document.getElementById('listaArchivos');
+
+            lista.innerHTML = '';
+
+            archivos.forEach(nombre => {
+
+                lista.innerHTML += `
+                    <li>
+                        <button onclick="verArchivo('${nombre}')">
+                            ${nombre}
+                        </button>
+                    </li>
+                `;
+            });
+        }
+
+        // Función ver archivo
+        async function verArchivo(nombre) {
+
+            const respuesta =  await fetch('/api/files/' + nombre);
+            const data = await respuesta.json();
+
+            document.getElementById('contenido').innerHTML = data.html;
+        }
+
+        // Función crear archivo
+        async function crearArchivo() {
+
+            const nombre =
+                document.getElementById('nombreArchivo').value;
+
+            const contenido =
+                document.getElementById('contenidoArchivo').value;
+
+            const respuesta = await fetch('/api/files', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    nombre: nombre,
+                    contenido: contenido
+                })
+            });
+
+            const data = await respuesta.json();
+
+            alert(data.mensaje || data.error);
+
+            listarArchivos();
+        }
+
+        listarArchivos();
+        
+    </script>
+</body>
+</html>
