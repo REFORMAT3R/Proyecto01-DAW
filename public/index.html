@@ -11,7 +11,7 @@
 
     <h2>Archivos disponibles</h2>
 
-    <button onclick="listaArchivos()">
+    <button onclick="listarArchivos()">
         Listar archivos
     </button>
 
@@ -37,6 +37,70 @@
     <button onclick="crearArchivo()">
         Crear archivo
     </button>
-    
+
+    <script>
+
+        // Función listar archivos
+        async function listarArchivos() {
+            
+            const respuesta = await fetch('/api/files');
+            const archivos = await respuesta.json();
+            const lista = document.getElementById('listaArchivos');
+
+            lista.innerHTML = '';
+
+            archivos.forEach(nombre => {
+
+                lista.innerHTML += `
+                    <li>
+                        <button onclick="verArchivo('${nombre}')">
+                            ${nombre}
+                        </button>
+                    </li>
+                `;
+            });
+        }
+
+        // Función ver archivo
+        async function verArchivo(nombre) {
+
+            const respuesta =  await fetch('/api/files/' + nombre);
+            const data = await respuesta.json();
+
+            document.getElementById('contenido').innerHTML = data.html;
+        }
+
+        async function crearArchivo() {
+
+            const nombre =
+                document.getElementById('nombreArchivo').value;
+
+            const contenido =
+                document.getElementById('contenidoArchivo').value;
+
+            const respuesta = await fetch('/api/files', {
+
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    nombre: nombre,
+                    contenido: contenido
+                })
+            });
+
+            const data = await respuesta.json();
+
+            alert(data.mensaje || data.error);
+
+            listarArchivos();
+        }
+
+        listarArchivos();
+        
+    </script>
 </body>
 </html>
